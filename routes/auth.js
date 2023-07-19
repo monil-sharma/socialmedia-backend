@@ -20,7 +20,7 @@ router.post("/register", async (req, res) => {
     const user = await newUser.save();
     res.status(200).json(user);
   } catch (err) {
-    console.log(err);
+    return res.status(500).json(err);
   }
   //   res.send("User auth page");
 });
@@ -28,10 +28,22 @@ router.post("/register", async (req, res) => {
 //LOGIN
 router.post("/login", async (req, res) => {
   try {
+    //find user in DB
     const user = await User.findOne({ email: req.body.email });
+    //if user not found return message
     !user && res.status(404).json("User not found");
+
+    //compare password entered with password in DB
+    const validPassword = await bcrypt.compare(
+      req.body.password,
+      user.password
+    );
+    //if password not match return message
+    !validPassword && res.status(400).json("Wrong password");
+
+    res.status(200).json(user);
   } catch (err) {
-    console.log(err);
+    return res.status(500).json(err);
   }
 });
 
