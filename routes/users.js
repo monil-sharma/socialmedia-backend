@@ -57,5 +57,46 @@ router.get("/:id", async (req, res) => {
 });
 
 //Follow a user
+router.put("/:id/follow", async (req, res) => {
+  if (req.body.userID !== req.params.id) {
+    //checking if the target and current user are not same
+    try {
+      const user = await User.findById(req.params.id);
+      const currentUser = await User.findById(req.body.userID);
+      if (!user.followers.includes(req.body.userID)) {
+        await user.updateOne({ $push: { followers: req.body.userID } }); //current user added as follower of target user
+        await currentUser.updateOne({ $push: { followings: req.params.id } }); //target user is added in followings of the current user
+        res.status(200).json("Started to follow user");
+      } else {
+        res.status(403).json("You already follow this user");
+      }
+    } catch (error) {
+      res.status(500).json(error);
+    }
+  } else {
+    res.status(403).json("You cannot follow yourself!");
+  }
+});
 //Unfollow a user
+router.put("/:id/unfollow", async (req, res) => {
+  if (req.body.userID !== req.params.id) {
+    //checking if the target and current user are not same
+    try {
+      const user = await User.findById(req.params.id);
+      const currentUser = await User.findById(req.body.userID);
+      if (user.followers.includes(req.body.userID)) {
+        //above condition checks if current user follows target user
+        await user.updateOne({ $pull: { followers: req.body.userID } }); //current user removed from follower of target user
+        await currentUser.updateOne({ $pull: { followings: req.params.id } }); //target user is removed from followings of the current user
+        res.status(200).json("Unfollowed user");
+      } else {
+        res.status(403).json("You don't follow this user in the first place");
+      }
+    } catch (error) {
+      res.status(500).json(error);
+    }
+  } else {
+    res.status(403).json("You cannot unfollow yourself!");
+  }
+});
 module.exports = router;
