@@ -70,8 +70,8 @@ router.put("/:id/follow", async (req, res) => {
       } else {
         res.status(403).json("You already follow this user");
       }
-    } catch (error) {
-      res.status(500).json(error);
+    } catch (err) {
+      res.status(500).json(err);
     }
   } else {
     res.status(403).json("You cannot follow yourself!");
@@ -92,8 +92,8 @@ router.put("/:id/unfollow", async (req, res) => {
       } else {
         res.status(403).json("You don't follow this user in the first place");
       }
-    } catch (error) {
-      res.status(500).json(error);
+    } catch (err) {
+      res.status(500).json(err);
     }
   } else {
     res.status(403).json("You cannot unfollow yourself!");
